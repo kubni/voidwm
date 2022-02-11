@@ -10,7 +10,7 @@ static const int nmaster        = 1;        /* number of clients in master area 
 static const int resizehints    = 0;        /* 1 means respect size hints in tiled resizals */
 
 /* ----------------- gaps ---------------- */
-static          int smartgaps   = 0;        /* 1 means no outer gap when there is only one window */
+static          int smartgaps   = 1;        /* 1 means no outer gap when there is only one window */
 static          int enablegaps  = 1;        /* 1 means enable gaps on startup */
 static unsigned int gappih      = 10;       /* horiz inner gap between windows */
 static unsigned int gappiv      = 10;       /* vert inner gap between windows */
@@ -64,7 +64,6 @@ static const unsigned int ulinestroke   = 2;     /* underline thickness */
 static const unsigned int ulinevoffset  = 0;     /* how far above the bottom of the bar the line should appear */
 
 /* --------------- defaults -------------- */
-#define APP_BROWSER             "firefox"
 #define APP_BROWSER_            "firefox --private-window"
 #define APP_MENU                "dmenu_run"
 #define APP_TERM                "st"
@@ -107,7 +106,7 @@ static const BarRule barrules[] = {
 	/* { -1,       0,     BAR_ALIGN_LEFT_LEFT,     width_wintitle,        draw_wintitle,        click_wintitle,     "wintitle" }, */
 	{ 'A',      0,     BAR_ALIGN_RIGHT_RIGHT,   width_systray,         draw_systray,         click_systray,      "systray"  },
 	{ 'A',      0,     BAR_ALIGN_RIGHT_RIGHT,   width_status2d,        draw_status2d,        click_status2d,     "status2d" },
-	/* { 'A',      0,     BAR_ALIGN_RIGHT_RIGHT,   width_status,          draw_status,          click_status,       "status"   }, */
+	/* { 'A',      0,     BAR_ALIGN_RIGHT_RIGHT,   width_status,          draw_status2d,          click_status,       "status"   }, */ 
 };
 
 /* --------------- layouts --------------- */
@@ -173,23 +172,24 @@ ResourcePref resources[]        = {
 /* first arg only serves to match against key in rules */
 static const char *scratchpadcmd[] = { "s", APP_TERM, "-c", CLASS_SP, "-t", TITLE_SP, NULL };
 
-static const char *menucmd[]    = { APP_MENU, "-p", "Run ", "-h", BARHEIGHT_STR, NULL };
+static const char *menucmd[]    = { APP_MENU, "-p", "Run ", NULL };
 static const char *termcmd[]    = { APP_TERM, NULL };
 
+static const char *ytcmd[] =	{ "freetube", NULL };
+
 #include <X11/XF86keysym.h>
-static const char vol_up[]      =  "pactl set-sink-volume 0 +5%; kill -44 $(pidof dwmblocks)" ;
-static const char vol_down[]    =  "pactl set-sink-volume 0 -5%; kill -44 $(pidof dwmblocks)" ;
-static const char vol_mute[]    =  "pactl set-sink-mute 0 toggle; kill -44 $(pidof dwmblocks)";
+static const char vol_up[]      =  "pactl set-sink-volume 1 +5%; kill -44 $(pidof dwmblocks)" ;
+static const char vol_down[]    =  "pactl set-sink-volume 1 -5%; kill -44 $(pidof dwmblocks)" ;
+static const char vol_mute[]    =  "pactl set-sink-mute 1 toggle; kill -44 $(pidof dwmblocks)";
 #define XCLIP_PNG               " | xclip -selection clipboard -target image/png"
 
 /* ------------- keybindings ------------- */
 static Key keys[]               = {
 	/* modifier                     key         function        argument */
-	{ MODKEY,                       XK_Return,  spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_d,       spawn,          {.v = menucmd } },
-	{ MODKEY,                       XK_q,       xrdb,           {.v = NULL    } },
-	{ MODKEY|ShiftMask,             XK_q,       quit,           {1} },
-	{ MODKEY|ControlMask,           XK_q,       quit,           {0} },
+	{ MODKEY,                       XK_Return,  spawn,          {.v = termcmd  } },
+	{ MODKEY,                       XK_d,       spawn,          {.v = menucmd  } },
+        { MODKEY|ShiftMask,             XK_q,       quit,           {0}              },
+	/*{ MODKEY,                       XK_q,       xrdb,           {.v = NULL     } }, */
 
 	/* ---------- layouts ---------- */
 	{ MODKEY,                       XK_t,       setlayout,      {.v = &layouts[0] } }, /* tile */
@@ -210,7 +210,7 @@ static Key keys[]               = {
 	{ MODKEY|ControlMask,           XK_equal,   incrgaps,       {.i = +3 } }, /* inc all gaps */
 
 	/* ----------- stack ----------- */
-	{ MODKEY|ShiftMask,             XK_c,       killclient,     {0} },
+	{ MODKEY,                       XK_q,       killclient,     {0} },
 	{ MODKEY,                       XK_e,       focusurgent,    {0} },
 	{ MODKEY,                       XK_s,       togglesticky,   {0} },
 	{ MODKEY,                       XK_j,       focusstack,     {.i = +1 } },
@@ -228,8 +228,7 @@ static Key keys[]               = {
 
 	/* ----------- resize ---------- */
 	{ MODKEY,                       XK_space,   togglefloating,         {0} },
-	{ MODKEY,                       XK_f,       togglefullscreen,       {0} },
-	{ MODKEY|ShiftMask,             XK_f,       togglefakefullscreen,   {0} },
+	{ MODKEY|ShiftMask,             XK_f,       togglefullscreen,       {0} },
 	{ MODKEY|ControlMask,           XK_h,       setmfact,       {.f = -0.05 } },
 	{ MODKEY|ControlMask,           XK_j,       setcfact,       {.f = -0.05 } },
 	{ MODKEY|ControlMask,           XK_k,       setcfact,       {.f = +0.05 } },
@@ -251,8 +250,8 @@ static Key keys[]               = {
 	{ MODKEY,                       XK_p,       togglescratch,  {.v = scratchpadcmd } },
 
 	/* ---------- keyboard --------- */
-	{ MODKEY,                       XK_a,       spawn,          SHCMD("maim -qu"  XCLIP_PNG) },
-	{ MODKEY|ShiftMask,             XK_a,       spawn,          SHCMD("maim -qus" XCLIP_PNG) },
+	{ MODKEY,                       XK_Print,   spawn,          SHCMD("maim -qus" XCLIP_PNG) }, 
+	{ MODKEY|ShiftMask,             XK_Print,   spawn,          SHCMD("maim -qu"  XCLIP_PNG) },
 	{ 0,            XF86XK_AudioLowerVolume,    spawn,          SHCMD(vol_down) },
 	{ 0,            XF86XK_AudioRaiseVolume,    spawn,          SHCMD(vol_up)   },
 	{ 0,            XF86XK_AudioMute,           spawn,          SHCMD(vol_mute) },
@@ -264,8 +263,8 @@ static Key keys[]               = {
 	{ MODKEY|ShiftMask, XK_backslash,           spawn,          SHCMD("xbacklight -set 50") },
 
 	/* ------------ apps ----------- */
-	{ MODKEY,                       XK_F2,      spawn,          SHCMD(APP_BROWSER)  },
-	{ MODKEY,                       XK_F3,      spawn,          SHCMD(APP_BROWSER_) },
+	{ MODKEY,                       XK_f,      spawn,          SHCMD(APP_BROWSER_) },
+        { MODKEY,                       XK_v,      spawn,          {.v = ytcmd } },
 
 	/* ----------- other ----------- */
 	/* { MODKEY,                       XK_Tab,     view,           {0} }, */
