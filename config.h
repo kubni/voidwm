@@ -4,7 +4,7 @@
 static const char *fonts[]      = { "JetBrainsMono Nerd Font:style=medium:size=10", "monospace:size=10" };
 static unsigned int borderpx    = 2;        /* border pixel of windows */
 static unsigned int snap        = 10;       /* snap pixel */
-static int swallowfloating      = 0;        /* 1 means swallow floating windows by default */
+static int swallowfloating      = 1;        /* 1 means swallow floating windows by default */
 static const float mfact        = 0.50;     /* factor of master area size [0.05..0.95] */
 static const int nmaster        = 1;        /* number of clients in master area */
 static const int resizehints    = 0;        /* 1 means respect size hints in tiled resizals */
@@ -38,6 +38,16 @@ static char *colors[][3]        = {
 	[SchemeTag5] = { color1,        background,     background  },
 };
 
+/* My colors for use in dmenu */
+static const char col_nord4[]       = "#4C566A";
+static const char col_nord0[]       = "#2E3440";
+static const char col_nord9[]       = "#81A1C1";
+static const char col_nord7[]       = "#88C0D0";
+static const char col_gray1[]       = "#222222";
+static const char col_gray2[]       = "#444444";
+static const char col_gray3[]       = "#bbbbbb";
+static const char col_gray4[]       = "#eeeeee";
+
 /* ----------------- tags ---------------- */
 static const char *tags[]       = { " ", " ", "⭘ ", " ", " " };
 static const int tagschemes[]   = { SchemeTag1, SchemeTag2, SchemeTag3, SchemeTag4, SchemeTag5 };
@@ -65,7 +75,7 @@ static const unsigned int ulinevoffset  = 0;     /* how far above the bottom of 
 
 /* --------------- defaults -------------- */
 #define APP_BROWSER_            "firefox --private-window"
-#define APP_MENU                "dmenu_run"
+#define APP_MENU                "rofi"
 #define APP_TERM                "st"
 #define CLASS_TERM              "St"
 #define CLASS_SP                "ScratchPad"
@@ -82,7 +92,6 @@ static const Rule rules[]       = {
 	{ CLASS_SP,           NULL,       TITLE_SP,       0,          1,          1,          0,          -1,     's' },
 	{ CLASS_TERM,         NULL,       NULL,           0,          0,          1,          0,          -1,     0   },
 	{ "mpv",              NULL,       NULL,           1 << 2,     0,          0,          0,          -1,     0   },
-	{ "TelegramDesktop",  NULL,       NULL,           1 << 4,     0,          0,          0,          -1,     0   },
 	{ NULL,               NULL,       "Event Tester", 0,          0,          0,          1,          -1,     0   },
 };
 
@@ -159,6 +168,7 @@ ResourcePref resources[]        = {
 
 /* ----------- key definitions ----------- */
 #define MODKEY Mod4Mask
+#define ALTKEY Mod1Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -172,11 +182,11 @@ ResourcePref resources[]        = {
 /* first arg only serves to match against key in rules */
 static const char *scratchpadcmd[] = { "s", APP_TERM, "-c", CLASS_SP, "-t", TITLE_SP, NULL };
 
-static const char *menucmd[]    = { APP_MENU, "-p", "Run ", NULL };
-static const char *termcmd[]    = { APP_TERM, NULL };
-
-static const char *ytcmd[] =	{ "freetube", NULL };
-
+static const char *menucmd[]    = { APP_MENU, "-show", "drun", NULL}; 
+static const char *termcmd[]    = { APP_TERM, "tmux",  NULL };
+static const char *fmcmd[]      = { APP_TERM, "ranger", NULL }; // Zasto ne moze samo ranger ako moze da ga pokrene rofi
+static const char *ytcmd[]      = { "freetube", NULL };
+static const char *printcmd[] = { "import", "jpeg:ss.jpeg", NULL };
 #include <X11/XF86keysym.h>
 static const char vol_up[]      =  "pactl set-sink-volume 1 +5%; kill -44 $(pidof dwmblocks)" ;
 static const char vol_down[]    =  "pactl set-sink-volume 1 -5%; kill -44 $(pidof dwmblocks)" ;
@@ -188,6 +198,7 @@ static Key keys[]               = {
 	/* modifier                     key         function        argument */
 	{ MODKEY,                       XK_Return,  spawn,          {.v = termcmd  } },
 	{ MODKEY,                       XK_d,       spawn,          {.v = menucmd  } },
+	{ ALTKEY,                       XK_f,       spawn,          {.v = fmcmd  } },
         { MODKEY|ShiftMask,             XK_q,       quit,           {0}              },
 	/*{ MODKEY,                       XK_q,       xrdb,           {.v = NULL     } }, */
 
@@ -250,17 +261,18 @@ static Key keys[]               = {
 	{ MODKEY,                       XK_p,       togglescratch,  {.v = scratchpadcmd } },
 
 	/* ---------- keyboard --------- */
-	{ MODKEY,                       XK_Print,   spawn,          SHCMD("maim -qus" XCLIP_PNG) }, 
-	{ MODKEY|ShiftMask,             XK_Print,   spawn,          SHCMD("maim -qu"  XCLIP_PNG) },
-	{ 0,            XF86XK_AudioLowerVolume,    spawn,          SHCMD(vol_down) },
-	{ 0,            XF86XK_AudioRaiseVolume,    spawn,          SHCMD(vol_up)   },
-	{ 0,            XF86XK_AudioMute,           spawn,          SHCMD(vol_mute) },
-	{ MODKEY,       XK_bracketleft,             spawn,          SHCMD(vol_down) },
-	{ MODKEY,       XK_bracketright,            spawn,          SHCMD(vol_up)   },
-	{ MODKEY,       XK_backslash,               spawn,          SHCMD(vol_mute) },
-	{ MODKEY|ShiftMask, XK_bracketleft,         spawn,          SHCMD("xbacklight -dec 10") },
-	{ MODKEY|ShiftMask, XK_bracketright,        spawn,          SHCMD("xbacklight -inc 10") },
-	{ MODKEY|ShiftMask, XK_backslash,           spawn,          SHCMD("xbacklight -set 50") },
+//	{ MODKEY,               XK_Print,                   spawn,          SHCMD("maim -qus" XCLIP_PNG) }, 
+        {MODKEY, XK_Print, spawn, {.v = printcmd}},
+        { MODKEY|ShiftMask,     XK_Print,                   spawn,          SHCMD("maim -qu"  XCLIP_PNG) },
+	{ 0,                    XF86XK_AudioLowerVolume,    spawn,          SHCMD(vol_down) },
+	{ 0,                    XF86XK_AudioRaiseVolume,    spawn,          SHCMD(vol_up)   },
+	{ 0,                    XF86XK_AudioMute,           spawn,          SHCMD(vol_mute) },
+	{ MODKEY,               XK_bracketleft,             spawn,          SHCMD(vol_down) },
+	{ MODKEY,               XK_bracketright,            spawn,          SHCMD(vol_up)   },
+	{ MODKEY,               XK_backslash,               spawn,          SHCMD(vol_mute) },
+	{ MODKEY|ShiftMask,     XK_bracketleft,             spawn,          SHCMD("xbacklight -dec 10") },
+	{ MODKEY|ShiftMask,     XK_bracketright,            spawn,          SHCMD("xbacklight -inc 10") },
+	{ MODKEY|ShiftMask,     XK_backslash,               spawn,          SHCMD("xbacklight -set 50") },
 
 	/* ------------ apps ----------- */
 	{ MODKEY,                       XK_f,      spawn,          SHCMD(APP_BROWSER_) },
@@ -297,13 +309,13 @@ static Button buttons[]         = {
 	 * to control these separately (i.e. to retain the feature to move a tiled window
 	 * into a floating position).
 	 */
-	{ ClkClientWin,         MODKEY,         Button1,        moveorplace,    {.i = 2 } },
-	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
-	{ ClkClientWin,         MODKEY|ShiftMask, Button3,      dragcfact,      {0} },
-	{ ClkClientWin,         MODKEY|ShiftMask, Button1,      dragmfact,      {0} },
-	{ ClkTagBar,            0,              Button1,        view,           {0} },
-	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
-	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
-	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
+	{ ClkClientWin,         MODKEY,             Button1,        moveorplace,    {.i = 2 } },
+	{ ClkClientWin,         MODKEY,             Button2,        togglefloating, {0} },
+	{ ClkClientWin,         MODKEY,             Button3,        resizemouse,    {0} },
+	{ ClkClientWin,         MODKEY|ShiftMask,   Button3,        dragcfact,      {0} },
+	{ ClkClientWin,         MODKEY|ShiftMask,   Button1,        dragmfact,      {0} },
+	{ ClkTagBar,            0,                  Button1,        view,           {0} },
+	{ ClkTagBar,            0,                  Button3,        toggleview,     {0} },
+	{ ClkTagBar,            MODKEY,             Button1,        tag,            {0} },
+	{ ClkTagBar,            MODKEY,             Button3,        toggletag,      {0} },
 };
