@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* --------------- settings -------------- */
-static const char *fonts[]      = { "JetBrainsMono Nerd Font:style=medium:size=10", "monospace:size=10" };
+static const char *fonts[]      = { "JetBrainsMono Nerd Font:style=medium:size=20", "monospace:size=20" };
 static unsigned int borderpx    = 2;        /* border pixel of windows */
 static unsigned int snap        = 10;       /* snap pixel */
 static int swallowfloating      = 1;        /* 1 means swallow floating windows by default */
