@@ -19,34 +19,55 @@ static unsigned int gappov      = 10;       /* vert outer gap between windows an
 
 /* ----------------- bar ----------------- */
 #define BARHEIGHT_STR           "27"        /* dmenu_run's -h value, match with barheight below */
-static int barheight            = 27;       /* 0 means dwm will calculate bar height wrt font */
+static int barheight            = 0;       /* 0 means dwm will calculate bar height wrt font */
 static int showbar              = 1;        /* 0 means no bar */
 static int topbar               = 1;        /* 0 means bottom bar */
 
 /* ------------- colorscheme ------------- */
 #include "colors/onedark.h"
+
+
+// Nord colorscheme 
+static char col_nord_polar0[]  = "#2E3440";
+static char col_nord_polar1[]  = "#3B4252";
+static char col_nord_polar2[]  = "#434C5E";
+static char col_nord_polar3[]  = "#4C566A";
+
+static char col_nord_snow0[]   = "#D8DEE9";
+static char col_nord_snow1[]   = "#E5E9F0";
+static char col_nord_snow2[]   = "#ECEFF4";
+                                           
+static char col_nord_frost0[]  = "#8FBCBB";
+static char col_nord_frost1[]  = "#88C0D0";
+static char col_nord_frost2[]  = "#81A1C1";
+static char col_nord_frost3[]  = "#5E81AC";
+                                          
+static char col_nord_aurora0[] = "#BF616A";
+static char col_nord_aurora1[] = "#D08770";
+static char col_nord_aurora2[] = "#EBCB8B";
+static char col_nord_aurora3[] = "#A3BE8C";
+static char col_nord_aurora4[] = "#B48EAD";
+
+
+
+static char col_gray1[]       = "#222222";
+static char col_gray2[]       = "#444444";
+static char col_gray3[]       = "#bbbbbb";
+static char col_gray4[]       = "#eeeeee";
 static char *colors[][3]        = {
-	/*               fg             bg              border  */
-	[SchemeNorm] = { foreground,    background,     background  },
-	[SchemeSel]  = { color6,        background,     color6      },
-	[SchemeUrg]  = { color9,        background,     color9      },
-	[SchemeTag]  = { color8,        background,     background  },
-	[SchemeTag1] = { color5,        background,     background  },
-	[SchemeTag2] = { color4,        background,     background  },
-	[SchemeTag3] = { color3,        background,     background  },
-	[SchemeTag4] = { color2,        background,     background  },
-	[SchemeTag5] = { color1,        background,     background  },
+	/*               fg                     bg              border  */
+	[SchemeNorm] = { foreground,            background,     col_nord_polar1  },
+	[SchemeSel]  = { color6,                background,     color6      },
+	[SchemeUrg]  = { color9,                background,     color9      },
+	[SchemeTag]  = { color8,                background,     background  },
+	[SchemeTag1] = { col_nord_frost2,       background,     background  },
+	[SchemeTag2] = { col_nord_frost3,       background,     background  },
+	[SchemeTag3] = { col_nord_aurora2,      background,     background  },
+	[SchemeTag4] = { col_nord_aurora3,      background,     background  },
+	[SchemeTag5] = { col_nord_aurora4,      background,     background  },
 };
 
-/* My colors for use in dmenu */
-static const char col_nord4[]       = "#4C566A";
-static const char col_nord0[]       = "#2E3440";
-static const char col_nord9[]       = "#81A1C1";
-static const char col_nord7[]       = "#88C0D0";
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
+
 
 /* ----------------- tags ---------------- */
 static const char *tags[]       = { " ", " ", "⭘ ", " ", " " };
@@ -186,12 +207,15 @@ static const char *menucmd[]    = { APP_MENU, "-show", "drun", NULL};
 static const char *termcmd[]    = { APP_TERM, "tmux",  NULL };
 static const char *fmcmd[]      = { APP_TERM, "ranger", NULL }; // Zasto ne moze samo ranger ako moze da ga pokrene rofi
 static const char *ytcmd[]      = { "freetube", NULL };
-static const char *printcmd[] = { "import", "jpeg:ss.jpeg", NULL };
+// maim -s -u | tee ~/Screenshots/$(date +%s).png | xclip -selection clipboard -t image/png
+static const char *printcmd[] = { "maim", "-s", "-u",  NULL };
 #include <X11/XF86keysym.h>
 static const char vol_up[]      =  "pactl set-sink-volume 1 +5%; kill -44 $(pidof dwmblocks)" ;
 static const char vol_down[]    =  "pactl set-sink-volume 1 -5%; kill -44 $(pidof dwmblocks)" ;
 static const char vol_mute[]    =  "pactl set-sink-mute 1 toggle; kill -44 $(pidof dwmblocks)";
-#define XCLIP_PNG               " | xclip -selection clipboard -target image/png"
+
+#define XCLIP_PNG               " | xclip -selection clipboard -t image/png"
+#define TEE_PNG                 " | tee ~/Screenshots/$(date +%s).png"
 
 /* ------------- keybindings ------------- */
 static Key keys[]               = {
@@ -262,8 +286,7 @@ static Key keys[]               = {
 
 	/* ---------- keyboard --------- */
 //	{ MODKEY,               XK_Print,                   spawn,          SHCMD("maim -qus" XCLIP_PNG) }, 
-        {MODKEY, XK_Print, spawn, {.v = printcmd}},
-        { MODKEY|ShiftMask,     XK_Print,                   spawn,          SHCMD("maim -qu"  XCLIP_PNG) },
+        { MODKEY,               XK_Print,                   spawn,          SHCMD("maim -s -u" TEE_PNG XCLIP_PNG) },
 	{ 0,                    XF86XK_AudioLowerVolume,    spawn,          SHCMD(vol_down) },
 	{ 0,                    XF86XK_AudioRaiseVolume,    spawn,          SHCMD(vol_up)   },
 	{ 0,                    XF86XK_AudioMute,           spawn,          SHCMD(vol_mute) },
