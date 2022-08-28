@@ -56,15 +56,15 @@ static char col_gray3[]       = "#bbbbbb";
 static char col_gray4[]       = "#eeeeee";
 static char *colors[][3]        = {
 	/*               fg                     bg              border  */
-	[SchemeNorm] = { foreground,            background,     col_nord_polar1  },
-	[SchemeSel]  = { color6,                background,     color6      },
-	[SchemeUrg]  = { color9,                background,     color9      },
-	[SchemeTag]  = { color8,                background,     background  },
-	[SchemeTag1] = { col_nord_frost2,       background,     background  },
-	[SchemeTag2] = { col_nord_frost3,       background,     background  },
-	[SchemeTag3] = { col_nord_aurora2,      background,     background  },
-	[SchemeTag4] = { col_nord_aurora3,      background,     background  },
-	[SchemeTag5] = { col_nord_aurora4,      background,     background  },
+	[SchemeNorm] = { foreground,            background,     col_nord_frost3  },
+	[SchemeSel]  = { color6,                background,     col_nord_frost3      },
+	[SchemeUrg]  = { color9,                background,     col_nord_frost3      },
+	[SchemeTag]  = { color8,                background,     col_nord_frost3  },
+	[SchemeTag1] = { col_nord_frost2,       background,     col_nord_frost3  },
+	[SchemeTag2] = { col_nord_frost3,       background,     col_nord_frost3  },
+	[SchemeTag3] = { col_nord_aurora2,      background,     col_nord_frost3  },
+	[SchemeTag4] = { col_nord_aurora3,      background,     col_nord_frost3  },
+	[SchemeTag5] = { col_nord_aurora4,      background,     col_nord_frost3  },
 };
 
 
@@ -95,7 +95,7 @@ static const unsigned int ulinestroke   = 2;     /* underline thickness */
 static const unsigned int ulinevoffset  = 0;     /* how far above the bottom of the bar the line should appear */
 
 /* --------------- defaults -------------- */
-#define APP_BROWSER_            "firefox --private-window"
+#define APP_BROWSER_            "librewolf" //"firefox --private-window"
 #define APP_MENU                "rofi"
 #define APP_TERM                "st"
 #define CLASS_TERM              "St"
@@ -198,14 +198,14 @@ ResourcePref resources[]        = {
 
 /* --------------- commands -------------- */
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+#define SHCMD(cmd) { .v = (const char*[]){ "/bin/bash", "-c", cmd, NULL } }
 
 /* first arg only serves to match against key in rules */
 static const char *scratchpadcmd[] = { "s", APP_TERM, "-c", CLASS_SP, "-t", TITLE_SP, NULL };
 
-static const char *menucmd[]    = { APP_MENU, "-show", "drun", NULL}; 
+static const char *menucmd[]    = { "t3_launcher", NULL}; 
 static const char *termcmd[]    = { APP_TERM, "tmux",  NULL };
-static const char *fmcmd[]      = { APP_TERM, "ranger", NULL }; // Zasto ne moze samo ranger ako moze da ga pokrene rofi
+static const char *fmcmd[]      = { APP_TERM, "ranger", NULL }; 
 static const char *ytcmd[]      = { "freetube", NULL };
 // maim -s -u | tee ~/Screenshots/$(date +%s).png | xclip -selection clipboard -t image/png
 static const char *printcmd[] = { "maim", "-s", "-u",  NULL };
@@ -221,8 +221,7 @@ static const char vol_mute[]    =  "pactl set-sink-mute 1 toggle; kill -44 $(pid
 static Key keys[]               = {
 	/* modifier                     key         function        argument */
 	{ MODKEY,                       XK_Return,  spawn,          {.v = termcmd  } },
-	{ MODKEY,                       XK_d,       spawn,          {.v = menucmd  } },
-	{ ALTKEY,                       XK_f,       spawn,          {.v = fmcmd  } },
+	{ ALTKEY,                       XK_f,       spawn,          {.v = fmcmd    } },
         { MODKEY|ShiftMask,             XK_q,       quit,           {0}              },
 	/*{ MODKEY,                       XK_q,       xrdb,           {.v = NULL     } }, */
 
@@ -247,7 +246,7 @@ static Key keys[]               = {
 	/* ----------- stack ----------- */
 	{ MODKEY,                       XK_q,       killclient,     {0} },
 	{ MODKEY,                       XK_e,       focusurgent,    {0} },
-	{ MODKEY,                       XK_s,       togglesticky,   {0} },
+	{ MODKEY|ShiftMask,             XK_s,       togglesticky,   {0} },
 	{ MODKEY,                       XK_j,       focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,       focusstack,     {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_j,       rotatestack,    {.i = +1 } },
@@ -286,6 +285,8 @@ static Key keys[]               = {
 
 	/* ---------- keyboard --------- */
 //	{ MODKEY,               XK_Print,                   spawn,          SHCMD("maim -qus" XCLIP_PNG) }, 
+     	{ MODKEY,               XK_d,                       spawn,          SHCMD("/home/nikola/.config/rofi/launchers/type-3/launcher.sh") },
+     	{ MODKEY,               XK_s,                       spawn,          SHCMD("/home/nikola/.config/rofi/powermenu/type-4/powermenu.sh") },
         { MODKEY,               XK_Print,                   spawn,          SHCMD("maim -s -u" TEE_PNG XCLIP_PNG) },
 	{ 0,                    XF86XK_AudioLowerVolume,    spawn,          SHCMD(vol_down) },
 	{ 0,                    XF86XK_AudioRaiseVolume,    spawn,          SHCMD(vol_up)   },
