@@ -105,7 +105,7 @@ static const unsigned int ulinevoffset =
 /* --------------- defaults -------------- */
 #define APP_BROWSER_ "librewolf" //"firefox --private-window"
 #define APP_MENU "rofi"
-#define APP_TERM "kitty"
+#define APP_TERM "wezterm"
 #define CLASS_TERM "St"
 #define CLASS_SP "ScratchPad"
 #define TITLE_SP "scratchpad"
@@ -225,7 +225,7 @@ ResourcePref resources[] = {
 static const char *scratchpadcmd[] = {"s",  APP_TERM, "-c", CLASS_SP,
                                       "-t", TITLE_SP, NULL};
 
-static const char *menucmd[] = {"t3_launcher", NULL};
+static const char *menucmd[] = {APP_MENU, "-show", "drun"};
 static const char *termcmd[] = {APP_TERM, NULL};
 static const char *fmcmd[] = {APP_TERM, "ranger", NULL};
 static const char *ytcmd[] = {"freetube", NULL};
@@ -313,10 +313,11 @@ static Key keys[] = {
     {MODKEY, XK_p, togglescratch, {.v = scratchpadcmd}},
 
     /* ---------- keyboard --------- */
-    {MODKEY, XK_d, spawn,
-     SHCMD("/home/nikola/.config/rofi/launchers/type-3/launcher.sh")},
-    {MODKEY, XK_s, spawn,
-     SHCMD("/home/nikola/.config/rofi/powermenu/type-4/powermenu.sh")},
+    {MODKEY, XK_d, spawn, {.v = menucmd}},
+    /* {MODKEY, XK_d, spawn, */
+    /*  SHCMD("/home/nikola/.config/rofi/launchers/type-3/launcher.sh")}, */
+    /* {MODKEY, XK_s, spawn, */
+    /*  SHCMD("/home/nikola/.config/rofi/powermenu/type-4/powermenu.sh")}, */
     {MODKEY, XK_Print, spawn, SHCMD("maim -s -u" TEE_PNG XCLIP_PNG)},
     {0, XF86XK_AudioLowerVolume, spawn, SHCMD(vol_down)},
     {0, XF86XK_AudioRaiseVolume, spawn, SHCMD(vol_up)},

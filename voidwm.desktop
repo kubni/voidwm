@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=voidwm
 Comment=Dynamic Window Manager
-Exec=dwm
+Exec=/home/nikola/Programs/voidwm/autostart.sh
 Icon=dwm
 Type=Application
