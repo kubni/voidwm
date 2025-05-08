@@ -1,6 +1,5 @@
-/* See LICENSE file for copyright and license details. */
-
 /* --------------- settings -------------- */
+
 static const char *fonts[] = {"JetBrainsMono Nerd Font:style=medium:size=20",
                               "monospace:size=20"};
 static unsigned int borderpx = 2; /* border pixel of windows */
@@ -230,9 +229,11 @@ static const char *termcmd[] = {APP_TERM, NULL};
 static const char *fmcmd[] = {APP_TERM, "ranger", NULL};
 static const char *ytcmd[] = {"freetube", NULL};
 static const char *printcmd[] = {"maim", "-s", "-u", NULL};
-static const char *pulsemixer_cmd[] = {APP_TERM, "pulsemixer", NULL};
+static const char *pulsemixer_cmd[] = {APP_TERM, "start", "pulsemixer", NULL};
 static const char *cpupowergui_cmd[] = {"cpupower-gui", NULL};
 static const char *bitwarden_cmd[] = {"bitwarden-desktop", NULL};
+static const char *emacs_cmd[] = {"emacs", NULL};
+
 
 #include <X11/XF86keysym.h>
 static const char vol_up[] =
@@ -386,4 +387,9 @@ static Button buttons[] = {
     {ClkTagBar, 0, Button3, toggleview, {0}},
     {ClkTagBar, MODKEY, Button1, tag, {0}},
     {ClkTagBar, MODKEY, Button3, toggletag, {0}},
+};
+
+Autostarttag autostarttaglist[] = {
+    {.cmd = emacs_cmd, .tags = 1 << 1 },
+    {.cmd = NULL, .tags = 0 },
 };

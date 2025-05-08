@@ -223,6 +223,12 @@ typedef struct {
 	const char scratchkey;
 } Rule;
 
+typedef struct {
+	const char **cmd;
+	unsigned int tags;
+} Autostarttag;
+
+
 /* Xresources preferences */
 enum resource_type {
 	STRING = 0,
@@ -330,6 +336,8 @@ static void sighup(int unused);
 static void sigterm(int unused);
 static void spawn(const Arg *arg);
 static void spawnscratch(const Arg *arg);
+static void autostarttagsspawner(void);
+static void applyautostarttags(Client *c);
 static int swallow(Client *p, Client *c);
 static Client *swallowingclient(Window w);
 static void tag(const Arg *arg);
@@ -405,6 +413,10 @@ static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
 static xcb_connection_t *xcon;
+static unsigned int autostarttags = 0;
+static int autostartcomplete = 0;
+static int autostartcmdscomplete = 0;
+
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -1860,7 +1872,14 @@ manage(Window w, XWindowAttributes *wa)
 		c->tags = t->tags;
 	} else {
 		c->mon = selmon;
-		applyrules(c);
+		// TODO: Maybe termforwin needst o be in the if too? Check if there are problems
+		/* applyrules(c); */
+		/* term = termforwin(c); */
+		if (autostarttags) {
+			applyautostarttags(c);
+		} else {
+			applyrules(c);
+		}
 		term = termforwin(c);
 	}
 
@@ -2556,8 +2575,12 @@ run(void)
 	/* main event loop */
 	XSync(dpy, False);
 	while (running && !XNextEvent(dpy, &ev))
+	{
+		if (!(autostartcomplete || autostarttags))
+			autostarttagsspawner();
 		if (handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
+	}
 }
 
 void
@@ -3142,6 +3165,35 @@ tag(const Arg *arg)
 			view(arg);
 	}
 }
+
+void
+autostarttagsspawner(void)
+{
+	int i;
+	Arg arg;
+
+	for (i = autostartcmdscomplete; i < LENGTH(autostarttaglist) ; i++){
+		autostartcmdscomplete += 1;
+		autostarttags = autostarttaglist[i].tags;
+		arg.v = autostarttaglist[i].cmd ;
+		spawn(&arg);
+		return;
+	}
+	autostartcomplete = 1;
+	return;
+}
+
+void
+applyautostarttags(Client *c)
+{
+	if (!c)
+		return;
+	c->tags = autostarttags;
+	autostarttags = 0;
+	return;
+}
+
+
 
 void
 tagmon(const Arg *arg)
